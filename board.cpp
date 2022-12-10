@@ -20,11 +20,11 @@ void Board::mouseClick(int i, int j)
     checkifOver();
 }
 
-void Board::Reverse(int i, int j)
+void Board::Reverse(int i , int j)
 {
-    int p, q;
-    for (p = -1; p < 2; p++) { for (q = -1; q < 2; q++) { Board::Test(i, j, p, q); } }
-    for (int i = 0; i < 8; ++i) { for (int j = 0; j < 8; ++j) { if (m_board[i][j] == AVAILABLE) { m_board[i][j] = EMPTY; } } }
+    for (int p = -1; p < 2; p++) { for (int q = -1; q < 2; q++) { Board::Test(i, j, p, q); } }
+    for (int i = 0; i < 8; ++i) { for (int j = 0; j < 8; ++j)
+    { if (m_board[i][j] == AVAILABLE) { m_board[i][j] = EMPTY; } } }
 }
 
 void Board::Test(int i, int j, int m, int n)
@@ -50,99 +50,94 @@ void Board::Test(int i, int j, int m, int n)
             count++;
         }
         if (0<=p && p<8 && 0<=q && q<8)
-		{ for (r = i+m, s = j+n;r!=p || s!=q;r += m, s += n) { if (m_board[r][s] == BLACK) { *&m_board[r][s] = WHITE; } } }
+        {
+            for (r = i+m, s = j+n;r!=p || s!=q;r += m, s += n)
+            { if (m_board[r][s] == BLACK) { m_board[r][s] = WHITE; } }
+        }
     }
 }
 
 void Board::modelTest(int i, int j, int m, int n)
 {
     int p, q, r, s, count = 0;
-    for (p = i+m, q = j+n;p>=0 && p<8 && q>=0 && q<8;p += m, q += n)
+    for (p = i+m, q = j+n;p>=0 && p<8 && q>=0 && q<8;p += m, q += n , count++)
     {
-        if (modelmap[p][q]==0) return;
-        else if (modelmap[p][q]==-1)
-        {
-            break;
-        }
-        count++;
+        if (modelmap[p][q]==0) { return; }
+        else if (modelmap[p][q]==-1) { break; }
     }
-    if (0<=p && p<8 && 0<=q && q<8)
-    {
-        for (r = i+m, s = j+n;r!=p || s!=q;r += m, s += n)
-        {
-            *&modelmap[r][s] = -1;
-        }
-    }
+    for (r = i+m, s = j+n;r!=p || s!=q;r += m, s += n) { modelmap[r][s] = -1; }
 }
 
 bool Board::checkmodelifAvailable(int i, int j, int m, int n)
 {
-    int p = i+m, q = j+n;bool flag = false;
+    int p = i+m, q = j+n;
+    bool flag = false;
     for ( ;p>=0 && p<8 && q>=0 && q<8;p += m, q += n)
     {
-        if (m*m+n*n==0) break;
-        else if (flag==false)
+        if (m  == 0 && n == 0) { break; }
+        else if (!flag)
         {
             if (modelmap[p][q]==1 || modelmap[p][q]==0) { return false; }
             else { flag = true; }
         }
         else if (modelmap[p][q]==0) { return false; }
         else if (modelmap[p][q]==1) { return true ; }
-        else continue;
     }
     return false;
 }
 
 void Board::robot()
 {
-    if (Board::isGameOver==true) { return ; }
-    int point[8][8] = {0}, i, j, highest = 0, hi = 0, hj = 0, m, n;
-    bool flag = false;
-    Board::isGameOver = true;
-    for (i = 0;i<8;i++)
+    if (!Board::isGameOver)
     {
-        for (j = 0;j<8;j++)
+        int point[8][8] = {0}, i, j, highest = 0, hi = 0, hj = 0, m, n;
+        bool flag = false;
+        Board::isGameOver = true;
+        for (i = 0;i<8;i++)
         {
-            if (m_board[i][j]==WHITE) { Board::isGameOver = false; }
-            if (m_board[i][j]==EMPTY)
+            for (j = 0;j<8;j++)
             {
-                for (m = -1;m<2;m++)
+                if (m_board[i][j]==WHITE) { Board::isGameOver = false; }
+                if (m_board[i][j]==EMPTY)
                 {
-                    for (n = -1;n<2;n++)
+                    for (m = -1;m<2;m++)
                     {
-                        if (checkifAvailable(i, j, m, n, 1))
+                        for (n = -1;n<2;n++)
                         {
-                            flag = true;
-                            point[i][j] = 500+countPoint(i, j);
+                            if (checkifAvailable(i, j, m, n, 1))
+                            {
+                                flag = true;
+                                point[i][j] = 500+countPoint(i, j);
+                            }
                         }
                     }
                 }
             }
         }
-    }
-    if (flag)
-    {
-        for (i = 0;i<8;i++)
+        if (flag)
         {
-            for (j = 0;j<8;j++)
+            for (i = 0;i<8;i++)
             {
-                if (point[i][j]>highest)
+                for (j = 0;j<8;j++)
                 {
-                    hi = i;hj = j;
-                    highest = point[i][j];
+                    if (point[i][j]>highest)
+                    {
+                        hi = i;hj = j;
+                        highest = point[i][j];
+                    }
                 }
             }
+            m_board[hi][hj] = WHITE;
+            Reverse(hi, hj);
+            checkifOver();
         }
-        m_board[hi][hj] = WHITE;
-        Reverse(hi, hj);
-        checkifOver();
     }
-    return ;
 }
 
 void Board::checkifOver()
 {
-    int i, j, status[4] = {}, m, n;bool flag1 = true, flag2 = true;
+    int i, j, status[4] = {}, m, n;
+    bool flag1 = true, flag2 = true;
     for (i = 0;i<8;i++)
     {
         for (j = 0;j<8;j++)
@@ -154,14 +149,8 @@ void Board::checkifOver()
                 {
                     for (n = -1;n<2;n++)
                     {
-                        if (checkifAvailable(i, j, m, n, 1))
-                        {
-                            flag1 = false;
-                        }
-                        if (checkifAvailable(i, j, m, n, 2))
-                        {
-                            flag2 = false;
-                        }
+                        if (checkifAvailable(i, j, m, n, 1)) { flag1 = false; }
+                        if (checkifAvailable(i, j, m, n, 2)) { flag2 = false; }
                     }
                 }
             }
@@ -178,37 +167,33 @@ int Board::countPoint(int s, int r)
 {
     int point[8][8] =
     {
-        {90, -60, 10, 10, 10, 10, -60, 90}, {-60, -80, 5, 5, 5, 5, -80, -60},
-        {10, 5, 1, 1, 1, 1, 5, 10}, {10, 5, 1, 1, 1, 1, 5, 10}, {10, 5, 1, 1, 1, 1, 5, 10}, {10, 5, 1, 1, 1, 1, 5, 10},
-        {-60, -80, 5, 5, 5, 5, -80, -60}, {90, -60, 10, 10, 10, 10, -60, 90}
+        {90, -60, 10, 10, 10, 10, -60, 90},
+        {-60, -80, 5, 5, 5, 5, -80, -60},
+        {10, 5, 1, 1, 1, 1, 5, 10},
+        {10, 5, 1, 1, 1, 1, 5, 10},
+        {10, 5, 1, 1, 1, 1, 5, 10},
+        {10, 5, 1, 1, 1, 1, 5, 10},
+        {-60, -80, 5, 5, 5, 5, -80, -60},
+        {90, -60, 10, 10, 10, 10, -60, 90}
     };
     int i = 0, j = 0, m, n, p, q, sum = 0;
     bool flag = false;
     copymap();
     modelmap[s][r] = -1;
-    for (p = -1;p<2;p++)
-    {
-        for (q = -1;q<2;q++)
-        {
-            modelTest(s, r, p, q);
-        }
-    }
+    for (p = -1;p<2;p++) { for (q = -1;q<2;q++) { modelTest(s, r, p, q); } }
     for (i = 0;i<8;i++)
     {
         for (j = 0;j<8;j++)
         {
             if (modelmap[i][j]==0)
-            for (m = -1;m<2;m++)
             {
-                for (n = -1;n<2;n++)
+                for (m = -1;m<2;m++)
                 {
-                    if (checkmodelifAvailable(i, j, m, n)) { flag = true; }
+                    for (n = -1;n<2;n++)
+                    { if (checkmodelifAvailable(i, j, m, n)) { flag = true; } }
                 }
             }
-            if (flag)
-            {
-                if (point[i][j]>sum) { sum = point[i][j]; }
-            }
+            if (flag) { if (point[i][j]>sum) { sum = point[i][j]; } }
             flag = false;
         }
     }
@@ -222,12 +207,20 @@ void Board::copymap()
     {
         for (j = 0;j<8;j++)
         {
-            if (m_board[i][j]==WHITE) { modelmap[i][j] = -1; }
-            else if (m_board[i][j]==BLACK) { modelmap[i][j] = 1; }
-            else { modelmap[i][j] = 0; }
+            switch(m_board[i][j])
+            {
+                case WHITE:
+                    modelmap[i][j] = -1;
+                    break;
+                case BLACK:
+                    modelmap[i][j] = 1;
+                    break;
+                default:
+                    modelmap[i][j] = 0;
+                    break;
+            }
         }
     }
-    return ;
 }
 
 void Board::setAvailable()
@@ -261,37 +254,34 @@ void Board::setAvailable()
 
 bool Board::checkifAvailable(int i, int j, int m, int n, int cmd)
 {
-    int p, q;bool flag = false;
-    //case : white
+    int p, q;
+    bool flag = false;
     if (cmd==1)
     {
         for (p = i+m, q = j+n;p>=0 && p<8 && q>=0 && q<8;p += m, q += n)
         {
-            if (flag==false)
+            if (!flag)
             {
-                if (m_board[p][q]==WHITE || m_board[p][q]==EMPTY || m_board[p][q]==AVAILABLE) { return false; }
+                if (m_board[p][q]==WHITE || m_board[p][q]==EMPTY || m_board[p][q]==AVAILABLE)
+                { return false; }
                 else { flag = true; }
             }
-            else if (m_board[p][q]==EMPTY) { return false; }
-            else if (m_board[p][q]==AVAILABLE) { return false; }
+            else if (m_board[p][q]==EMPTY || m_board[p][q]==AVAILABLE) { return false; }
             else if (m_board[p][q]==WHITE) { return true ; }
-            else continue;
         }
     }
-    //case : black
     else if (cmd==2)
     {
         for (p = i+m, q = j+n;p>=0 && p<8 && q>=0 && q<8;p += m, q += n)
         {
             if (flag==false)
             {
-                if (m_board[p][q]==BLACK || m_board[p][q]==EMPTY || m_board[p][q]==AVAILABLE) { return false; }
+                if (m_board[p][q]==BLACK || m_board[p][q]==EMPTY || m_board[p][q]==AVAILABLE)
+                { return false; }
                 else { flag = true; }
             }
-            else if (m_board[p][q]==EMPTY) { return false; }
-            else if (m_board[p][q]==AVAILABLE) { return false; }
+            else if (m_board[p][q]==EMPTY || m_board[p][q]==AVAILABLE) { return false; }
             else if (m_board[p][q]==BLACK) { return true ; }
-            else continue;
         }
     }
     return false;

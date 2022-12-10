@@ -11,7 +11,7 @@ bin/NT/board.o: board.cpp header.hpp board.hpp
 	x86_64-w64-mingw32-g++ -c board.cpp -o bin/NT/board.o
 
 bin/WinCE.exe: bin/CE/resource.o bin/CE/window.o bin/CE/board.o
-	arm-mingw32ce-g++ bin/CE/window.o bin/CE/board.o bin/CE/resource.o -s -O3 -march=armv5tej -mcpu=arm926ej-s -o bin/WinCE.exe -lcommctrl
+	arm-mingw32ce-g++ bin/CE/window.o bin/CE/board.o bin/CE/resource.o -s -O3 -march=armv5tej -mcpu=arm926ej-s -o bin/WinCE.exe -Lbin/ -lcommctrl
 
 bin/CE/resource.o: resource.rc reversi.ico menu.h
 	arm-mingw32ce-windres resource.rc -o bin/CE/resource.o

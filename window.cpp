@@ -16,7 +16,8 @@ int board_x , board_y , board_w , board_s , text_x , text_y , blackCount , white
 void MsgBox(const TCHAR *str , DWORD style)
 { MessageBox(m_hWnd , str , _T("GenkaiyaReversi") , style); }
 
-inline void drawText(HDC hDC , const TCHAR *str , RECT rc , UINT format) { DrawText(hDC , str , lstrlen(str) , &rc , format); }
+inline void drawText(HDC hDC , const TCHAR *str , RECT rc , UINT format)
+{ DrawText(hDC , str , lstrlen(str) , &rc , format); }
 
 void drawText(HDC hdc , unsigned int val , RECT rc , UINT format)
 {
@@ -119,7 +120,6 @@ void RefreshWindow()
 		if (whiteCount < blackCount) { SHOW_RESULT(_T("You Win!")); }
 		else if (whiteCount == blackCount) { SHOW_RESULT(_T("Draw!")); }
 		else if (whiteCount > blackCount) { SHOW_RESULT(_T("You Lose...\nGenkaiya...")); }
-		return;
 	}
 	else if (m_board->isnoAvailable)
 	{
@@ -127,7 +127,6 @@ void RefreshWindow()
 		m_board->robot();
 		m_board->setAvailable();
 		RefreshWindow();
-		return;
 	}
 }
 

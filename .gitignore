@@ -1,2 +1,2 @@
-*.o
-*.exe
+*.zip
+!/bmp.zip
